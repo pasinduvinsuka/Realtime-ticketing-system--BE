@@ -1,12 +1,15 @@
-package com.example.ticketingSystem.model;
+package com.example.ticketingSystem.service;
 
-//Consumer class
-public class Customer implements Runnable {
+import com.example.ticketingSystem.model.TicketPool;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ConfigurationService implements Runnable {
     private final int customerId;
     private final TicketPool ticketPool;
     private final boolean isVIP;
 
-    public Customer(int customerId, boolean isVIP, TicketPool ticketPool) {
+    public ConfigurationService(int customerId, boolean isVIP, TicketPool ticketPool) {
         this.customerId = customerId;
         this.isVIP = isVIP;
         this.ticketPool = ticketPool;
