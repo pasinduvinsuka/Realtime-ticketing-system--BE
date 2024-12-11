@@ -6,6 +6,7 @@ import com.example.ticketingSystem.model.Vendor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -15,33 +16,39 @@ public class TicketingService {
 
     private final ConfigurationService configurationService;
     private final CustomerService customerService;
+    private final VendorService vendorService;
 
     @Autowired
-    TicketingService(ConfigurationService configurationService, CustomerService customerService) {
+    TicketingService(ConfigurationService configurationService, CustomerService customerService, VendorService vendorService) {
         this.configurationService = configurationService;
         this.customerService = customerService;
+        this.vendorService = vendorService;
     }
 
     public void start() {
         int maxCapacity = configurationService.getMaxCapacity();
         int numVipCustomers = configurationService.getNumVipCustomers();
-        int regularCustomers = configurationService.getRegularCustomers();
+        int numRegularCustomers = configurationService.getNumRegularCustomers();
         int numberOfVendors = configurationService.getNumberOfVendors();
         int ticketReleaseRate = configurationService.getTicketReleaseRate();
         int customerRetrievalRate = configurationService.getCustomerRetrievalRate();
+
         PriorityBlockingQueue<CustomerPriority> customerQueue = customerService.getCustomerQueue();
+        Queue<Vendor> vendorQueue = vendorService.getVendorQueue();
 
         try (ExecutorService ticketExecutorService = Executors.newCachedThreadPool()) {
             TicketPool ticketPool = new TicketPool(maxCapacity, 2);
 
-            //add 2 vendors to the thread pool
-            for (int i = 0; i < numberOfVendors; i++) {
-                ticketExecutorService.execute(new Vendor(i, ticketPool, ticketReleaseRate));
-            }
+            //Add vendors
+            vendorService.addVendors(numberOfVendors, ticketPool, ticketReleaseRate);
 
             // Add customers
-            customerService.addRegularCustomers(regularCustomers, ticketPool, customerRetrievalRate);
+            customerService.addRegularCustomers(numRegularCustomers, ticketPool, customerRetrievalRate);
             customerService.addVipCustomers(numVipCustomers, ticketPool, customerRetrievalRate);
+
+            while (!vendorQueue.isEmpty()) {
+                ticketExecutorService.execute(vendorQueue.poll());
+            }
 
             while (!customerQueue.isEmpty()) {
                 ticketExecutorService.execute(customerQueue.poll().getCustomer());

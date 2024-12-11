@@ -13,7 +13,7 @@ public class ConfigurationService {
 
     private int maxCapacity;
     private int numVipCustomers;
-    private int regularCustomers;
+    private int numRegularCustomers;
     private int numberOfVendors;
     private int ticketReleaseRate;
     private int customerRetrievalRate;
@@ -34,7 +34,7 @@ public class ConfigurationService {
         this.numVipCustomers = sc.nextInt();
 
         System.out.println("Enter the number of regular customers : ");
-        this.regularCustomers = sc.nextInt();
+        this.numRegularCustomers = sc.nextInt();
 
         System.out.println("Enter the ticket release rate : ");
         this.ticketReleaseRate = sc.nextInt();
@@ -47,12 +47,12 @@ public class ConfigurationService {
     public void updateConfigurations(ConfigurationDTO config) {
         this.maxCapacity = config.getMaxCapacity();
         this.numVipCustomers = config.getNumVipCustomers();
-        this.regularCustomers = config.getRegularCustomers();
+        this.numRegularCustomers = config.getRegularCustomers();
         this.numberOfVendors = config.getNumberOfVendors();
         this.ticketReleaseRate = config.getTicketReleaseRate();
         this.customerRetrievalRate = config.getCustomerRetrievalRate();
 
-        customerService.addRegularCustomers(regularCustomers, ticketPool, customerRetrievalRate);
+        customerService.addRegularCustomers(numRegularCustomers, ticketPool, customerRetrievalRate);
         customerService.addVipCustomers(numVipCustomers, ticketPool, customerRetrievalRate);
     }
 

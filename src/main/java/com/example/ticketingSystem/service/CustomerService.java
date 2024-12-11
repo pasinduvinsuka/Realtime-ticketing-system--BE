@@ -3,10 +3,12 @@ package com.example.ticketingSystem.service;
 import com.example.ticketingSystem.model.Customer;
 import com.example.ticketingSystem.model.CustomerPriority;
 import com.example.ticketingSystem.model.TicketPool;
+import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.PriorityBlockingQueue;
 
+@Getter
 @Service
 public class CustomerService {
     private final PriorityBlockingQueue<CustomerPriority> customerQueue = new PriorityBlockingQueue<>();
@@ -27,7 +29,4 @@ public class CustomerService {
         }
     }
 
-    public PriorityBlockingQueue<CustomerPriority> getCustomerQueue() {
-        return customerQueue;
-    }
 }
