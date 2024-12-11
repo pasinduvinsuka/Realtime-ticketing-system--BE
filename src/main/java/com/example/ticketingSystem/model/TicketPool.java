@@ -1,5 +1,6 @@
 package com.example.ticketingSystem.model;
 
+import com.example.ticketingSystem.controller.TicketController;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.Queue;
@@ -12,19 +13,20 @@ public class TicketPool {
     private final Queue<String> tickets;
     private final int maxTicketCapacity;
     private final int totalTickets;
+    private final TicketController ticketController;
     ReentrantLock lock = new ReentrantLock();
     Condition notEmpty = lock.newCondition();
     Condition notFull = lock.newCondition();
-    private final SimpMessagingTemplate simpMessagingTemplate;  // For WebSocket messaging
 
-    public TicketPool(int maxTicketCapacity, int totalTickets, SimpMessagingTemplate simpMessagingTemplate) {
+
+    public TicketPool(int maxTicketCapacity, int totalTickets, TicketController ticketController) {
         this.maxTicketCapacity = maxTicketCapacity;
         this.totalTickets = totalTickets;
+        this.ticketController = ticketController;
         tickets = new ConcurrentLinkedQueue<>();
         for (int i = 0; i < this.totalTickets; i++) {
             tickets.add("Initial Ticket " + i);
         }
-        this.simpMessagingTemplate = simpMessagingTemplate;
 
     }
 
@@ -42,7 +44,7 @@ public class TicketPool {
             System.out.println("Total tickets after a add : " + tickets.size());
 
             // Send real-time update to clients
-            sendTicketCountUpdate();
+            ticketController.getTicketDetails(tickets);
 
             notEmpty.signalAll();
         } catch (Exception e) {
@@ -64,7 +66,7 @@ public class TicketPool {
             }
             String removedTicket = tickets.poll();
             System.out.println("Total tickets after a buy: " + tickets.size());
-            sendTicketCountUpdate();
+            ticketController.getTicketDetails(tickets);
             notFull.signalAll();
             return removedTicket;
         } catch (Exception e) {
@@ -75,8 +77,4 @@ public class TicketPool {
     }
 
 
-    private void sendTicketCountUpdate() {
-        int currentTicketCount = tickets.size();
-        simpMessagingTemplate.convertAndSend("/topic/tickets", currentTicketCount);
-    }
 }

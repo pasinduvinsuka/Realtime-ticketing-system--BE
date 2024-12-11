@@ -1,5 +1,6 @@
 package com.example.ticketingSystem.service;
 
+import com.example.ticketingSystem.controller.TicketController;
 import com.example.ticketingSystem.model.CustomerPriority;
 import com.example.ticketingSystem.model.TicketPool;
 import com.example.ticketingSystem.model.Vendor;
@@ -18,14 +19,14 @@ public class TicketingService {
     private final ConfigurationService configurationService;
     private final CustomerService customerService;
     private final VendorService vendorService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final TicketController ticketController;
 
     @Autowired
-    TicketingService(ConfigurationService configurationService, CustomerService customerService, VendorService vendorService, SimpMessagingTemplate simpMessagingTemplate) {
+    TicketingService(ConfigurationService configurationService, CustomerService customerService, VendorService vendorService, TicketController ticketController) {
         this.configurationService = configurationService;
         this.customerService = customerService;
         this.vendorService = vendorService;
-        this.simpMessagingTemplate = simpMessagingTemplate;
+        this.ticketController = ticketController;
     }
 
     public void start() {
@@ -40,7 +41,7 @@ public class TicketingService {
         PriorityBlockingQueue<CustomerPriority> customerQueue = customerService.getCustomerQueue();
         Queue<Vendor> vendorQueue = vendorService.getVendorQueue();
         try (ExecutorService ticketExecutorService = Executors.newCachedThreadPool()) {
-            TicketPool ticketPool = new TicketPool(maxCapacity, 2, simpMessagingTemplate);
+            TicketPool ticketPool = new TicketPool(maxCapacity, 2, ticketController);
 
             //Add vendors
             vendorService.addVendors(numberOfVendors, ticketPool, ticketReleaseRate);
