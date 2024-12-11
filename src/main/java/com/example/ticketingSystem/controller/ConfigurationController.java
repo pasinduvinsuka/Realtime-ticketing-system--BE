@@ -5,22 +5,37 @@ import com.example.ticketingSystem.dto.ResponseDto;
 import com.example.ticketingSystem.service.ConfigurationService;
 import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(name = "v1/configuration")
+@RequestMapping(value = "configuration/v1")
 public class ConfigurationController {
 
     @Autowired
     ConfigurationService configurationService;
-    @GetMapping()
-    public ResponseDto<ConfigurationDTO> getConfiguration(){
-        configurationService.run();
-        return new ResponseDto<>(1,"test",null);
+
+    @GetMapping
+    public ResponseEntity<ResponseDto<ConfigurationDTO>> getConfiguration() {
+
+
+        ConfigurationDTO config = new ConfigurationDTO(
+                configurationService.getMaxCapacity(),
+                configurationService.getNumVipCustomers(),
+                configurationService.getRegularCustomers(),
+                configurationService.getNumberOfVendors(),
+                configurationService.getTicketReleaseRate(),
+                configurationService.getCustomerRetrievalRate()
+        );
+
+        ResponseDto<ConfigurationDTO> response = new ResponseDto<>(200, "success", config);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping("/{id}")
-    public ResponseDto<Void> updateConfiguration(@PathParam("id") int id, @RequestBody ConfigurationDTO){
-        return new ResponseDto<>(2,"superb", null);
+    @PutMapping("/update")
+    public ResponseDto<Void> updateConfiguration(@RequestBody ConfigurationDTO configurationDTO) {
+        configurationService.updateConfigurations(configurationDTO);
+        return new ResponseDto<>(2, "superb", null);
     }
 }

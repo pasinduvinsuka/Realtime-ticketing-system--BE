@@ -1,31 +1,29 @@
 package com.example.ticketingSystem.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 import java.sql.Date;
 import java.sql.Time;
 
 //Producer class
+@Data
+@AllArgsConstructor
 public class Vendor implements Runnable {
     private final int vendorId;
-    TicketPool ticketPool;
-    int ticketReleaseRate = 100; // how often the tickets will be released (in here each second )
-
-    public Vendor(int vendorId, TicketPool ticketPool) {
-        this.vendorId = vendorId;
-        this.ticketPool = ticketPool;
-    }
+    private final TicketPool ticketPool;
+    private final int ticketReleaseRate;
 
     @Override
     public void run() {
-        try {
+        if (ticketReleaseRate == 0) {
+            System.out.println("New tickets are not adding to the pool since the release rate is 0");
+        } else {
             while (true) {
-
                 String ticket = "Ticket-" + vendorId + "-" + System.currentTimeMillis();
-                ticketPool.addTicket(ticket);
-//                System.out.println("Ticket added: " + ticket + "vendor - " + vendorId + " ## " + Thread.currentThread().getName() + " ##" + Thread.currentThread().getState());
-                Thread.sleep(ticketReleaseRate);//ticket release rate
+                ticketPool.addTicket(ticket, ticketReleaseRate);
             }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
+
     }
 }

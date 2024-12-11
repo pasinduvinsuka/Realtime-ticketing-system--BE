@@ -1,33 +1,61 @@
 package com.example.ticketingSystem.service;
 
+import com.example.ticketingSystem.dto.ConfigurationDTO;
 import com.example.ticketingSystem.model.TicketPool;
+import lombok.Getter;
 import org.springframework.stereotype.Service;
 
+import java.util.Scanner;
+
+@Getter
 @Service
-public class ConfigurationService implements Runnable {
-    private final int customerId;
-    private final TicketPool ticketPool;
-    private final boolean isVIP;
+public class ConfigurationService {
 
-    public ConfigurationService(int customerId, boolean isVIP, TicketPool ticketPool) {
-        this.customerId = customerId;
-        this.isVIP = isVIP;
-        this.ticketPool = ticketPool;
+    private int maxCapacity;
+    private int numVipCustomers;
+    private int regularCustomers;
+    private int numberOfVendors;
+    private int ticketReleaseRate;
+    private int customerRetrievalRate;
+    private CustomerService customerService;
+    private TicketPool ticketPool;
+
+
+    public ConfigurationService() {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Enter the max ticket capacity : ");
+        this.maxCapacity = sc.nextInt();
+
+        System.out.println("Enter the number of vendors : ");
+        this.numberOfVendors = sc.nextInt();
+
+        System.out.println("Enter the number of VIP customers : ");
+        this.numVipCustomers = sc.nextInt();
+
+        System.out.println("Enter the number of regular customers : ");
+        this.regularCustomers = sc.nextInt();
+
+        System.out.println("Enter the ticket release rate : ");
+        this.ticketReleaseRate = sc.nextInt();
+
+        System.out.println("Enter the customer retrieval rate : ");
+        this.customerRetrievalRate = sc.nextInt();
+
     }
 
-    @Override
-    public void run() {
-        try {
-            while (true) {
-//                System.out.println("Customer " + customerId + " attempting to buy a ticket..." + "####isVip: " + isVIP);
-                String ticket = ticketPool.removeTicket();
-                System.out.println("Ticket " + ticket + " purchased by customer :" + customerId + " vip status :" + isVIP + " ## " + Thread.currentThread().getName() + " ##" + Thread.currentThread().getState());
-                int customerRetrievalRate = 1;
-                Thread.sleep(customerRetrievalRate);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void updateConfigurations(ConfigurationDTO config) {
+        this.maxCapacity = config.getMaxCapacity();
+        this.numVipCustomers = config.getNumVipCustomers();
+        this.regularCustomers = config.getRegularCustomers();
+        this.numberOfVendors = config.getNumberOfVendors();
+        this.ticketReleaseRate = config.getTicketReleaseRate();
+        this.customerRetrievalRate = config.getCustomerRetrievalRate();
+
+        customerService.addRegularCustomers(regularCustomers, ticketPool, customerRetrievalRate);
+        customerService.addVipCustomers(numVipCustomers, ticketPool, customerRetrievalRate);
     }
+
+
 }
 

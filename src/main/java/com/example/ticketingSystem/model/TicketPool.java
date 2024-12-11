@@ -18,21 +18,23 @@ public class TicketPool {
         this.maxTicketCapacity = maxTicketCapacity;
         this.totalTickets = totalTickets;
         tickets = new ConcurrentLinkedQueue<>();
-        for (int i = 0; i < totalTickets; i++) {
+        for (int i = 0; i < this.totalTickets; i++) {
             tickets.add("Initial Ticket " + i);
         }
     }
 
     //method to add tickets into the pool
-    public void addTicket(String ticket) {
+    public void addTicket(String ticket, int ticketReleaseRate) {
         try {
             lock.lock();
-            while ( tickets.size() == maxTicketCapacity) {
+            while (tickets.size() == maxTicketCapacity) {
                 System.out.println("Pool full. Vendor waiting...");
                 notFull.await();
             }
-            tickets.add(ticket);
-            System.out.println("Total tickets after a add : " + tickets.size() );
+            for (int i = 0; i < ticketReleaseRate; i++) {
+                tickets.add(ticket);
+            }
+            System.out.println("Total tickets after a add : " + tickets.size());
             notEmpty.signalAll();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -50,7 +52,7 @@ public class TicketPool {
                 notEmpty.await();
             }
             String removedTicket = tickets.poll();
-            System.out.println("Total tickets after a buy: " + tickets.size() );
+            System.out.println("Total tickets after a buy: " + tickets.size());
             notFull.signalAll();
             return removedTicket;
         } catch (Exception e) {
