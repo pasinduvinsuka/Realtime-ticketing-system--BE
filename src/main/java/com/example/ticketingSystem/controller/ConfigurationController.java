@@ -21,24 +21,17 @@ public class ConfigurationController {
     @GetMapping
     public ResponseEntity<ResponseDto<ConfigurationDTO>> getConfiguration() {
 
-        ConfigurationDTO config = new ConfigurationDTO(
-                configurationService.getMaxCapacity(),
-                configurationService.getTotalTickets(),
-                configurationService.getNumVipCustomers(),
-                configurationService.getNumRegularCustomers(),
-                configurationService.getNumberOfVendors(),
-                configurationService.getTicketReleaseRate(),
-                configurationService.getCustomerRetrievalRate()
-        );
+        ConfigurationDTO config = new ConfigurationDTO(configurationService.getMaxCapacity(), configurationService.getTotalTickets(), configurationService.getNumVipCustomers(), configurationService.getNumRegularCustomers(), configurationService.getNumberOfVendors(), configurationService.getTicketReleaseRate(), configurationService.getCustomerRetrievalRate());
 
-        ResponseDto<ConfigurationDTO> response = new ResponseDto<>(200, "success", config);
+        ResponseDto<ConfigurationDTO> response = new ResponseDto<>(200, false, "Successfully Retrieved", config);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/update")
-    public ResponseDto<Void> updateConfiguration(@RequestBody ConfigurationDTO configurationDTO) {
+    public ResponseEntity<ResponseDto<ConfigurationDTO>> updateConfiguration(@RequestBody ConfigurationDTO configurationDTO) {
         configurationService.updateConfigurations(configurationDTO);
         ticketingService.restart(); // Start ticketing process
-        return new ResponseDto<>(2, "Successfully Updated", null);
+        ResponseDto<ConfigurationDTO> response = new ResponseDto<>(200, false, "Successfully Updated", configurationDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

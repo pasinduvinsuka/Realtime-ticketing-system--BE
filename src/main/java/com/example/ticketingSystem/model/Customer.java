@@ -1,19 +1,20 @@
 package com.example.ticketingSystem.model;
 
-import lombok.AllArgsConstructor;
-
 //Consumer class
 public class Customer implements Runnable {
-    private final int customerId;
     private final boolean isVIP;
     private final TicketPool ticketPool;
     private final int customerRetrievalRate;
+    private volatile boolean running = true;
 
     public Customer(int customerId, boolean isVIP, TicketPool ticketPool, int customerRetrievalRate) {
-        this.customerId = customerId;
         this.isVIP = isVIP;
         this.ticketPool = ticketPool;
         this.customerRetrievalRate = customerRetrievalRate;
+    }
+
+    public void stop() {
+        running = false;
     }
 
     @Override
@@ -21,19 +22,20 @@ public class Customer implements Runnable {
         if (customerRetrievalRate == 0) {
             System.out.println("Customers are not retrieving the tickets since retrieval rate is 0.");
         } else {
-            try {
-                while (true) {
-                    for (int i = 0; i < customerRetrievalRate; i++) {
-                        String ticket = ticketPool.removeTicket();
-                        System.out.println("Ticket " + ticket + " purchased by customer :" + customerId + " vip status :" + isVIP + " ## " + Thread.currentThread().getName() + " ##" + Thread.currentThread().getState());
+            while (running) {
+                for (int i = 0; i < customerRetrievalRate; i++) {
+                    String ticket = ticketPool.removeTicket(isVIP);
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt(); // Preserve the interrupted status
+                        break;
                     }
-
                 }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
             }
         }
     }
 }
+
 
 

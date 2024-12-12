@@ -2,22 +2,21 @@ package com.example.ticketingSystem.util;
 
 import java.util.Scanner;
 
-public class  InputValidator {
-    private static int value = -1;
-
-    public static int  validateInput(Scanner sc, String message) {
+public class InputValidator {
+    public static int validateInput(Scanner sc, String message) {
+        int value;
         System.out.println(message);
         while (true) {
             if (sc.hasNextInt()) {
                 value = sc.nextInt();
-                if (value >= 0) {
+                if (value > 0) {
                     return value;
                 } else {
-                    System.out.println("Please enter a positive value");
+                    System.out.println("Please enter a positive integer (greater than zero):");
                 }
-
             } else {
-                System.out.println("Invalid Input");
+                System.out.println("Invalid input. Please enter a positive integer:");
+                sc.next(); // Consume the invalid input
             }
         }
     }

@@ -12,13 +12,22 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic");
         registry.setApplicationDestinationPrefixes("/app");
+        registry.setUserDestinationPrefix("/user");
+
     }
 
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://127.0.0.1:5500")
+                .setAllowedOrigins("http://localhost:3000")
                 .withSockJS();
+    }
+
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+        registry.setSendTimeLimit(20_000);  // Time limit for sending messages
+        registry.setSendBufferSizeLimit(512 * 1024);  // Buffer size limit
+        registry.setMessageSizeLimit(128 * 1024);  // Message size limit
     }
 }

@@ -18,6 +18,9 @@ public class TicketPool {
     Condition notEmpty = lock.newCondition();
     Condition notFull = lock.newCondition();
 
+    private int vipCount = 0;
+    private int nonVipCount = 0;
+
     public TicketPool(int maxTicketCapacity, int totalTickets, TicketController ticketController) {
         this.maxTicketCapacity = maxTicketCapacity;
         this.ticketController = ticketController;
@@ -61,7 +64,7 @@ public class TicketPool {
             logger.info("Total tickets after a add :{}", tickets.size());
 
             // Send real-time update to clients
-            ticketController.getTicketDetails(tickets);
+            ticketController.getTicketDetails(tickets, vipCount, nonVipCount);
 
             notEmpty.signalAll();
         } catch (Exception e) {
@@ -74,23 +77,37 @@ public class TicketPool {
     }
 
     //method to remove the ticket
-    public String removeTicket() {
+    public String removeTicket(boolean isVIP) {
         try {
             lock.lock();
             while (tickets.isEmpty()) {
                 logger.info("Pool empty. Customer waiting...");
                 notEmpty.await();
+
             }
             String removedTicket = tickets.poll();
             logger.info("Total tickets after a buy :{}", tickets.size());
-            ticketController.getTicketDetails(tickets);
+            logger.info("Bought by a  :{}", isVIP ? "VIP customer" : "regular customer");
+
+            if (isVIP) {
+                vipCount++;
+            } else {
+                nonVipCount++;
+            }
+            logger.info("Total VIP purchases: {}", vipCount);
+            logger.info("Total regular purchases: {}", nonVipCount);
+
+            ticketController.getTicketDetails(tickets, vipCount, nonVipCount);
             notFull.signalAll();
             return removedTicket;
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (RuntimeException e) {
             throw new RuntimeException(e);
         } finally {
             lock.unlock();
         }
+        return "";
     }
 
 

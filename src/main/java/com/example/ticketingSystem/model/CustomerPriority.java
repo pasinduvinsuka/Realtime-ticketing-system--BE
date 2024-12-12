@@ -1,10 +1,10 @@
 package com.example.ticketingSystem.model;
 
 public class CustomerPriority implements Comparable<CustomerPriority> {
-    Runnable customer;
+    Customer customer;
     boolean isVIP;
 
-    public CustomerPriority(Runnable customer, boolean isVIP) {
+    public CustomerPriority(Customer customer, boolean isVIP) {
         this.customer = customer;
         this.isVIP = isVIP;
     }
@@ -14,7 +14,7 @@ public class CustomerPriority implements Comparable<CustomerPriority> {
         return Boolean.compare(o.isVIP, isVIP);
     }
 
-    public Runnable getCustomer() {
+    public Customer getCustomer() {
         return customer;
     }
 }

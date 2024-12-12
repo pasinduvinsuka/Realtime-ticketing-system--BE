@@ -84,8 +84,17 @@ public class TicketingService {
         ticketExecutorService.shutdown();
     }
 
+    public void stopAll() {
+        for (CustomerPriority customerPriority : customerQueue) {
+            customerPriority.getCustomer().stop();
+        }
+        for (Vendor vendor : vendorQueue) {
+            vendor.stop();
+        }
+    }
+
     public void restart() {
-        // Shut down the existing executor service
+        stopAll();
         ticketExecutorService.shutdown();
         try {
             // Wait for existing tasks to finish
@@ -101,7 +110,6 @@ public class TicketingService {
 
         // Reinitialize the executor service
         ticketExecutorService = Executors.newCachedThreadPool();
-
         // Refresh configurations and queues
         updateConfigs();
 

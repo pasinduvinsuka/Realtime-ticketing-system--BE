@@ -1,70 +1,144 @@
 package com.example.ticketingSystem.service;
 
 import com.example.ticketingSystem.dto.ConfigurationDTO;
-import lombok.Data;
-import lombok.Getter;
+import com.example.ticketingSystem.util.InputValidator;
 import org.springframework.stereotype.Service;
 
 import java.util.Scanner;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 @Service
 public class ConfigurationService {
 
+    private final ReentrantLock lock = new ReentrantLock();
+
     public int getMaxCapacity() {
-        return maxCapacity;
+        try {
+            lock.lock();
+            return maxCapacity;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setMaxCapacity(int maxCapacity) {
-        this.maxCapacity = maxCapacity;
+        try {
+            lock.lock();
+            this.maxCapacity = maxCapacity;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public int getTotalTickets() {
-        return totalTickets;
+        try {
+            lock.lock();
+            return totalTickets;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setTotalTickets(int totalTickets) {
-        this.totalTickets = totalTickets;
+        try {
+            lock.lock();
+            this.totalTickets = totalTickets;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public int getNumVipCustomers() {
-        return numVipCustomers;
+        try {
+            lock.lock();
+            return numVipCustomers;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setNumVipCustomers(int numVipCustomers) {
-        this.numVipCustomers = numVipCustomers;
+        try {
+            lock.lock();
+            this.numVipCustomers = numVipCustomers;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public int getNumRegularCustomers() {
-        return numRegularCustomers;
+        try {
+            lock.lock();
+            return numRegularCustomers;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setNumRegularCustomers(int numRegularCustomers) {
-        this.numRegularCustomers = numRegularCustomers;
+        try {
+            lock.lock();
+            this.numRegularCustomers = numRegularCustomers;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public int getNumberOfVendors() {
-        return numberOfVendors;
+        try {
+            lock.lock();
+            return numberOfVendors;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setNumberOfVendors(int numberOfVendors) {
-        this.numberOfVendors = numberOfVendors;
+        try {
+            lock.lock();
+            this.numberOfVendors = numberOfVendors;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public int getTicketReleaseRate() {
-        return ticketReleaseRate;
+        try {
+            lock.lock();
+            return ticketReleaseRate;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setTicketReleaseRate(int ticketReleaseRate) {
-        this.ticketReleaseRate = ticketReleaseRate;
+        try {
+            lock.lock();
+            this.ticketReleaseRate = ticketReleaseRate;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public int getCustomerRetrievalRate() {
-        return customerRetrievalRate;
+        try {
+            lock.lock();
+            return customerRetrievalRate;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setCustomerRetrievalRate(int customerRetrievalRate) {
-        this.customerRetrievalRate = customerRetrievalRate;
+
+        try {
+            lock.lock();
+            this.customerRetrievalRate = customerRetrievalRate;
+        } finally {
+            lock.unlock();
+        }
+
     }
 
     private int maxCapacity;
@@ -74,35 +148,16 @@ public class ConfigurationService {
     private int numberOfVendors;
     private int ticketReleaseRate;
     private int customerRetrievalRate;
-//    @Autowired
-//    private CustomerService customerService;
-//    @Autowired
-//    private TicketPool ticketPool;
-
 
     public void getConfigurations() {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.println("Enter the max ticket capacity : ");
-        this.maxCapacity = sc.nextInt();
-
-        System.out.println("Enter the total capacity:");
-        this.totalTickets = sc.nextInt();
-
-        System.out.println("Enter the number of vendors : ");
-        this.numberOfVendors = sc.nextInt();
-
-        System.out.println("Enter the number of VIP customers : ");
-        this.numVipCustomers = sc.nextInt();
-
-        System.out.println("Enter the number of regular customers : ");
-        this.numRegularCustomers = sc.nextInt();
-
-        System.out.println("Enter the ticket release rate : ");
-        this.ticketReleaseRate = sc.nextInt();
-
-        System.out.println("Enter the customer retrieval rate : ");
-        this.customerRetrievalRate = sc.nextInt();
+        Scanner scanner = new Scanner(System.in);
+        this.maxCapacity = InputValidator.validateInput(scanner, "Enter the max ticket capacity : ");
+        this.totalTickets = InputValidator.validateInput(scanner, "Enter the total capacity:");
+        this.numberOfVendors = InputValidator.validateInput(scanner, "Enter the number of vendors : ");
+        this.numVipCustomers = InputValidator.validateInput(scanner, "Enter the number of VIP customers : ");
+        this.numRegularCustomers = InputValidator.validateInput(scanner, "Enter the number of regular customers : ");
+        this.ticketReleaseRate = InputValidator.validateInput(scanner, "Enter the ticket release rate : ");
+        this.customerRetrievalRate = InputValidator.validateInput(scanner, "Enter the customer retrieval rate : ");
     }
 
 
@@ -114,9 +169,7 @@ public class ConfigurationService {
         this.numberOfVendors = config.getNumberOfVendors();
         this.ticketReleaseRate = config.getTicketReleaseRate();
         this.customerRetrievalRate = config.getCustomerRetrievalRate();
-//
-//        customerService.addRegularCustomers(numRegularCustomers, ticketPool, customerRetrievalRate);
-//        customerService.addVipCustomers(numVipCustomers, ticketPool, customerRetrievalRate);
+
     }
 
 

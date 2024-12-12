@@ -1,16 +1,12 @@
 package com.example.ticketingSystem.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Date;
-import java.sql.Time;
 
 //Producer class
 public class Vendor implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(Vendor.class);
+    private volatile boolean running = true;
 
     public Vendor(int vendorId, TicketPool ticketPool, int ticketReleaseRate) {
         this.vendorId = vendorId;
@@ -22,14 +18,25 @@ public class Vendor implements Runnable {
     private final TicketPool ticketPool;
     private final int ticketReleaseRate;
 
+    public void stop() {
+        running = false;
+    }
+
     @Override
     public void run() {
         if (ticketReleaseRate == 0) {
             logger.info("New tickets are not adding to the pool since the release rate is 0");
         } else {
-            while (true) {
+            while (running) {
                 String ticket = "Ticket-" + vendorId + "-" + System.currentTimeMillis();
                 ticketPool.addTicket(ticket, ticketReleaseRate);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Preserve the interrupted status
+                    break;
+                }
+
             }
         }
 

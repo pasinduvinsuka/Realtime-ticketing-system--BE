@@ -1,18 +1,27 @@
 package com.example.ticketingSystem.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-
-
 public class TicketDetailsDto {
+
+    private final int totalTickets;
+    private final int vipCount;
+    private final int nonVipCount;
+
     public int getTotalTickets() {
         return totalTickets;
     }
 
-    public TicketDetailsDto(int totalTickets) {
-        this.totalTickets = totalTickets;
+    public int getVipCount() {
+        return vipCount;
     }
 
-    private final int totalTickets;
+    public int getNonVipCount() {
+        return nonVipCount;
+    }
+
+    public TicketDetailsDto(int totalTickets, int vipCount, int nonVipCount) {
+        this.totalTickets = totalTickets;
+        this.vipCount = vipCount;
+        this.nonVipCount = nonVipCount;
+    }
+
 }
